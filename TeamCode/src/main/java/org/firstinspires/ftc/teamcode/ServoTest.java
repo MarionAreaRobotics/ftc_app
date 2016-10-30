@@ -10,26 +10,31 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp(name="Servo", group="Testing")
 public class ServoTest extends OpMode {
 
-    private Servo servoTesting = null;
+    private Servo leftArmServo = null;
+    private Servo rightArmServo = null;
 
     public void init() {
 
-        servoTesting = hardwareMap.servo.get("servo 1");
-        servoTesting.setPosition(0);
+        leftArmServo = hardwareMap.servo.get("servo left");
+        rightArmServo = hardwareMap.servo.get("servo right");
 
+        leftArmServo.setPosition(0);
+        rightArmServo.setPosition(0);
+
+        rightArmServo.setDirection(Servo.Direction.REVERSE);
     }
 
     public void loop() {
-        telemetry.addData("Servo Position", servoTesting.getPosition());
         if (gamepad1.a) {
-            if (servoTesting.getPosition() != 1) {
-            servoTesting.setPosition(1);
+            if ((leftArmServo.getPosition() != 1) && (rightArmServo.getPosition() != 0)) {
+                leftArmServo.setPosition(1);
+                rightArmServo.setPosition(0);
             }
         } else {
-            if (servoTesting.getPosition() != 0) {
-                servoTesting.setPosition(0);
+            if ((leftArmServo.getPosition() != 0) && (rightArmServo.getPosition() != 1)) {
+                leftArmServo.setPosition(0);
+                rightArmServo.setPosition(1);
             }
         }
-
     }
 }
