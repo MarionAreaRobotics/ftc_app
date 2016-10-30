@@ -13,10 +13,12 @@ public class OlympianTest extends OpMode {
     private DcMotor leftMotor2 = null;
     private DcMotor rightMotor1 = null;
     private DcMotor rightMotor2 = null;
+    private DcMotor harvesterMotor = null;
+    private DcMotor launcherMotor1 = null;
+    private DcMotor launcherMotor2 = null;
     private double motorThreshold = 0.065;
 
-    @Override
-    public void init() {
+    public void driveInit() {
         telemetry.addData("Status", "Initialized");
 
         leftMotor1 = hardwareMap.dcMotor.get("left motor 1");
@@ -29,6 +31,21 @@ public class OlympianTest extends OpMode {
         telemetry.addData("Status", "Initialized");
     }
 
+    public void harvesterInit() {
+        harvesterMotor = hardwareMap.dcMotor.get("harvester motor");
+    }
+
+    public void launcherInit() {
+        launcherMotor1 = hardwareMap.dcMotor.get("launcher motor 1");
+        launcherMotor2 = hardwareMap.dcMotor.get("launcher motor 2");
+    }
+
+    @Override
+    public void init() {
+        driveInit();
+        //harvesterInit();
+        launcherInit();
+    }
 
     @Override
     public void init_loop() {
@@ -45,8 +62,8 @@ public class OlympianTest extends OpMode {
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
-    @Override
-    public void loop() {
+
+    public void driveLoop() {
         // Driving control "telemetry"
         telemetry.addData("Status", "Running: " + runtime.toString());
         telemetry.addData("RightX", gamepad1.right_stick_x);
@@ -84,6 +101,39 @@ public class OlympianTest extends OpMode {
         rightMotor2.setPower(coord);
     }
 
+    public void harvesterLoop() {
+        if (gamepad2.dpad_up) {
+            harvesterMotor.setPower(1);
+        } else if (gamepad2.dpad_down) {
+            harvesterMotor.setPower(-1);
+            } else {
+                harvesterMotor.setPower(0);
+        }
+    }
+
+    public void launcherLoop(){
+        if (gamepad2.right_trigger > 0) {
+            launcherMotor1.setDirection(DcMotor.Direction.FORWARD);
+            launcherMotor2.setDirection(DcMotor.Direction.REVERSE);
+            launcherMotor1.setPower(gamepad2.right_trigger);
+            launcherMotor2.setPower(gamepad2.right_trigger);
+        } else if (gamepad2.left_trigger > 0) {
+            launcherMotor1.setDirection(DcMotor.Direction.REVERSE);
+            launcherMotor2.setDirection(DcMotor.Direction.FORWARD);
+            launcherMotor1.setPower(gamepad2.left_trigger);
+            launcherMotor2.setPower(gamepad2.left_trigger);
+        } else {
+            launcherMotor1.setPower(0);
+            launcherMotor2.setPower(0);
+        }
+    }
+
+    @Override
+    public void loop() {
+        driveLoop();
+        //harvesterLoop();
+        launcherLoop();
+    }
     /*
      * Code to run ONCE after the driver hits STOP
      */

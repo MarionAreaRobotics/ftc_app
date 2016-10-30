@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="Muses", group="Testing")
@@ -13,9 +14,13 @@ public class MusesTest extends OpMode {
     private DcMotor leftMotor2 = null;
     private DcMotor rightMotor1 = null;
     private DcMotor rightMotor2 = null;
+    private DcMotor scoringMotor = null;
+    private DcMotor harvesterMotor = null;
+    private Servo stopBarServo = null;
 
-    @Override
-    public void init() {
+    private double motorThreshold = 0.065;
+
+    public void driveInit() {
         telemetry.addData("Status", "Initialized");
 
         leftMotor1 = hardwareMap.dcMotor.get("left motor 1");
@@ -28,6 +33,23 @@ public class MusesTest extends OpMode {
         telemetry.addData("Status", "Initialized");
     }
 
+    public void scoringInit() {
+        scoringMotor = hardwareMap.dcMotor.get("scoring motor");
+    }
+
+    public void harvesterInit() {
+        harvesterMotor = hardwareMap.dcMotor.get("harvester motor");
+        //harvesterMotor.setDirection(DcMotor.Direction.REVERSE);
+    }
+
+    @Override
+    public void init() {
+        driveInit();
+        scoringInit();
+        harvesterInit();
+        stopBarServo = hardwareMap.servo.get("stopbar");
+        stopBarServo.setPosition(0);
+    }
 
     @Override
     public void init_loop() {
@@ -44,40 +66,69 @@ public class MusesTest extends OpMode {
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
-    @Override
-    public void loop() {
+
+    public void driveLoop() {
+
         telemetry.addData("Status", "Running: " + runtime.toString());
         telemetry.addData("RightX", gamepad1.right_stick_x);
         telemetry.addData("RightY", gamepad1.right_stick_y);
         telemetry.addData("LeftX", gamepad1.left_stick_x);
         telemetry.addData("LeftY", gamepad1.left_stick_y);
 
-        float leftX = -gamepad1.left_stick_x;
+        float leftX = -gamepad1.left_stick_x;// assigning controller values to a variable
         float rightX = -gamepad1.right_stick_x;
         float leftY = -gamepad1.left_stick_y;
         float rightY = -gamepad1.right_stick_y;
 
+        float coord = leftY;
+        float coord1 = rightY;
+        DcMotor.Direction dir1 = DcMotor.Direction.REVERSE;
+        DcMotor.Direction dir2 = DcMotor.Direction.REVERSE;
+        DcMotor.Direction dir3 = DcMotor.Direction.FORWARD;
+        DcMotor.Direction dir4 = DcMotor.Direction.FORWARD;
 
-        if ((leftX >= 0.05 && rightX >= 0.05) || (leftX <= -0.05 && rightX <= -0.05)) {
-            rightMotor1.setDirection(DcMotor.Direction.FORWARD);
-            leftMotor1.setDirection(DcMotor.Direction.FORWARD);
-            rightMotor2.setDirection(DcMotor.Direction.REVERSE);
-            leftMotor2.setDirection(DcMotor.Direction.REVERSE);
-            leftMotor1.setPower(rightX);
-            rightMotor1.setPower(rightX);
-            leftMotor2.setPower(leftX);
-            rightMotor2.setPower(leftX);
+        if (((leftX >= motorThreshold) || (leftX <= -motorThreshold)) && ((rightX >= motorThreshold) || (rightX <= -motorThreshold))) {
+            dir1 = DcMotor.Direction.FORWARD;
+            dir4 = DcMotor.Direction.REVERSE;
+            coord = leftX;
+            coord1 = rightX;
+        }
+        leftMotor1.setDirection(dir1);// Set to FORWARD if using AndyMark motors
+        leftMotor2.setDirection(dir2);
+        rightMotor1.setDirection(dir3);
+        rightMotor2.setDirection(dir4);
+        leftMotor1.setPower(coord1);
+        leftMotor2.setPower(coord1);
+        rightMotor1.setPower(coord);
+        rightMotor2.setPower(coord);
+    }
+
+    public void scoringLoop() {
+        scoringMotor.setPower(gamepad2.left_stick_y);
+    }
+
+    public void harvesterLoop() {
+        harvesterMotor.setPower(gamepad2.right_stick_y);
+    }
+
+    @Override
+    public void loop() {
+        driveLoop();
+        scoringLoop();
+        harvesterLoop();
+        telemetry.addData("x",gamepad2.right_bumper);
+        telemetry.addData("position",stopBarServo.getPosition());
+        if (gamepad2.right_bumper) {
+            if (stopBarServo.getPosition() != 1) {
+                stopBarServo.setPosition(1);
+            }
         } else {
-            rightMotor1.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
-            rightMotor2.setDirection(DcMotor.Direction.REVERSE);
-            leftMotor1.setDirection(DcMotor.Direction.FORWARD);
-            leftMotor2.setDirection(DcMotor.Direction.FORWARD);
-            leftMotor1.setPower(rightY);
-            leftMotor2.setPower(rightY);
-            rightMotor1.setPower(leftY);
-            rightMotor2.setPower(leftY);
+            if (stopBarServo.getPosition() != 0) {
+                stopBarServo.setPosition(0);
+            }
         }
     }
+
     /*
      * Code to run ONCE after the driver hits STOP
      */

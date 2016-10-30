@@ -25,7 +25,7 @@ public class TitanTest extends OpMode
 
     public void driveInit() {
         leftMotor1  = hardwareMap.dcMotor.get("left motor 1");
-        leftMotor2  = hardwareMap.dcMotor.get("left motor 2");
+        leftMotor2  = hardwareMap.dcMotor.get("left1");
         rightMotor1 = hardwareMap.dcMotor.get("right motor 1");
         rightMotor2 = hardwareMap.dcMotor.get("right motor 2");
 
@@ -43,9 +43,13 @@ public class TitanTest extends OpMode
 
     public void armServosInit() {
         leftArmServo = hardwareMap.servo.get("left arm servo");
-        rightArmServo = hardwareMap.servo.get("right arm servo");
+        //rightArmServo = hardwareMap.servo.get("right arm servo");
 
-        rightArmServo.setDirection(Servo.Direction.REVERSE);
+        //leftArmServo.setDirection(Servo.Direction.REVERSE);
+
+        //rightArmServo.setPosition(.875);
+        //leftArmServo.setPosition(.875);
+        leftArmServo.setPosition(0);
     }
 
     @Override
@@ -85,16 +89,35 @@ public class TitanTest extends OpMode
     public void linearSlidesLoop() {
 
         leftLinearSlide.setPower(-gamepad2.left_stick_y);
-        rightLinearSlide.setPower(-gamepad2.left_stick_y);
+        rightLinearSlide.setPower(-gamepad2.right_stick_y);
 
     }
 
     public void armServosLoop() {
-
-        if(gamepad1.a){
-            rightArmServo.setPosition(1);
+        /*if (gamepad2.right_bumper) {
+            if ((leftArmServo.getPosition() != 0) && (rightArmServo.getPosition() != 0)) {
+                leftArmServo.setPosition(0);
+                rightArmServo.setPosition(0);
+            }
+        } else {
+            if ((leftArmServo.getPosition() != .875) && (rightArmServo.getPosition() != .875)) {
+                leftArmServo.setPosition(.875);
+                rightArmServo.setPosition(.875);
+            }
+        }
+        */
+        if (gamepad2.right_bumper) {
+            if (leftArmServo.getPosition() != 1) {
+                leftArmServo.setPosition(1);
+            } else {
+                if (leftArmServo.getPosition() != 0) {
+                    leftArmServo.setPosition(0);
+                }
+            }
         }
 
+        telemetry.addData("Left Servo Pos: ", leftArmServo.getPosition());
+        telemetry.addData("Right Servo Pos: ", rightArmServo.getPosition());
     }
 
     @Override
@@ -108,7 +131,7 @@ public class TitanTest extends OpMode
 
     /*
      * Code to run ONCE after the driver hits STOP
-     */
+hggh     */
     @Override
     public void stop() {
     }
