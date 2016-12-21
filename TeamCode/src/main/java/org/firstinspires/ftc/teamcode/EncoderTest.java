@@ -5,10 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
- * Created by mars on 10/30/16.
+ * Created by mars on 12/10/16.
  */
-@Autonomous(name="Auto", group="Testing")
-public class AutoTest extends OpMode {
+@Autonomous(name="Encoders", group="Auto")
+public class EncoderTest extends OpMode {
 
     private DcMotor leftMotor1 = null;
     private DcMotor leftMotor2 = null;
@@ -17,14 +17,13 @@ public class AutoTest extends OpMode {
 
     @Override
     public void init() {
-        telemetry.addData("Status", "Initialized");
 
-        leftMotor1 = hardwareMap.dcMotor.get("left motor 1");
-        leftMotor2 = hardwareMap.dcMotor.get("left motor 2");
+        leftMotor1  = hardwareMap.dcMotor.get("left motor 1");
+        leftMotor2  = hardwareMap.dcMotor.get("left motor 2");
         rightMotor1 = hardwareMap.dcMotor.get("right motor 1");
         rightMotor2 = hardwareMap.dcMotor.get("right motor 2");
-        rightMotor1.setDirection(DcMotor.Direction.REVERSE);
-        rightMotor2.setDirection(DcMotor.Direction.REVERSE);
+        leftMotor1.setDirection(DcMotor.Direction.REVERSE);
+        leftMotor2.setDirection(DcMotor.Direction.REVERSE);
 
         leftMotor1.setTargetPosition(0);
         leftMotor2.setTargetPosition(0);
@@ -35,23 +34,22 @@ public class AutoTest extends OpMode {
     @Override
     public void loop() {
 
-        if (leftMotor1.getCurrentPosition() >= 8000) {
-            leftMotor1.setPower(0);
-            leftMotor2.setPower(0);
-            rightMotor1.setPower(0);
-            rightMotor2.setPower(0);
+        if (leftMotor1.getCurrentPosition() >= 10000) {
+            leftMotor1.setPower(-1);
+            leftMotor2.setPower(-1);
+            rightMotor1.setPower(-1);
+            rightMotor2.setPower(-1);
         } else {
-            leftMotor1.setPower(.38);
-            leftMotor2.setPower(.38);
-            rightMotor1.setPower(.25);
-            rightMotor2.setPower(.25);
+            leftMotor1.setPower(1);
+            leftMotor2.setPower(1);
+            rightMotor1.setPower(1);
+            rightMotor2.setPower(1);
         }
 
         telemetry.addData("Left 1: ", leftMotor1.getCurrentPosition());
         telemetry.addData("Left 2: ", leftMotor2.getCurrentPosition());
         telemetry.addData("Right 1: ", rightMotor1.getCurrentPosition());
         telemetry.addData("Right 2: ", rightMotor2.getCurrentPosition());
-
     }
 
     @Override

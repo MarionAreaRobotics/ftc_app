@@ -7,13 +7,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 /**
  * Created by mars on 10/30/16.
  */
-@Autonomous(name="Auto", group="Testing")
-public class AutoTest extends OpMode {
+@Autonomous(name="OlympianAuto", group="Auto")
+public class OlympianAuto extends OpMode {
 
     private DcMotor leftMotor1 = null;
     private DcMotor leftMotor2 = null;
     private DcMotor rightMotor1 = null;
     private DcMotor rightMotor2 = null;
+    private Number counter = 0;
 
     @Override
     public void init() {
@@ -23,6 +24,8 @@ public class AutoTest extends OpMode {
         leftMotor2 = hardwareMap.dcMotor.get("left motor 2");
         rightMotor1 = hardwareMap.dcMotor.get("right motor 1");
         rightMotor2 = hardwareMap.dcMotor.get("right motor 2");
+        leftMotor1.setDirection(DcMotor.Direction.FORWARD);
+        leftMotor2.setDirection(DcMotor.Direction.FORWARD);
         rightMotor1.setDirection(DcMotor.Direction.REVERSE);
         rightMotor2.setDirection(DcMotor.Direction.REVERSE);
 
@@ -34,19 +37,25 @@ public class AutoTest extends OpMode {
 
     @Override
     public void loop() {
+        /*
+        counter = counter + 1;
+        telemetry.addData("Counter: ", counter);
+        if (counter < 5000) {
+            return;
+        }
+        */
 
-        if (leftMotor1.getCurrentPosition() >= 8000) {
+        if (rightMotor1.getCurrentPosition() >= 7000) {
             leftMotor1.setPower(0);
             leftMotor2.setPower(0);
             rightMotor1.setPower(0);
             rightMotor2.setPower(0);
         } else {
-            leftMotor1.setPower(.38);
-            leftMotor2.setPower(.38);
-            rightMotor1.setPower(.25);
-            rightMotor2.setPower(.25);
+            leftMotor1.setPower(.5);
+            leftMotor2.setPower(.5);
+            rightMotor1.setPower(.5);
+            rightMotor2.setPower(.5);
         }
-
         telemetry.addData("Left 1: ", leftMotor1.getCurrentPosition());
         telemetry.addData("Left 2: ", leftMotor2.getCurrentPosition());
         telemetry.addData("Right 1: ", rightMotor1.getCurrentPosition());
@@ -59,3 +68,4 @@ public class AutoTest extends OpMode {
 
     }
 }
+
