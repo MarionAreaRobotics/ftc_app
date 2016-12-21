@@ -20,44 +20,59 @@ public class TitanTest extends OpMode
     private DcMotor leftLinearSlide = null;
     private DcMotor rightLinearSlide = null;
 
+    private DcMotor launchMotor = null;
+
     private Servo leftArmServo = null;
-    private Servo rightArmServo = null;
+
+    private Servo launchServo = null;
 
     public void driveInit() {
+
         leftMotor1  = hardwareMap.dcMotor.get("left motor 1");
         leftMotor2  = hardwareMap.dcMotor.get("left1");
         rightMotor1 = hardwareMap.dcMotor.get("right motor 1");
         rightMotor2 = hardwareMap.dcMotor.get("right motor 2");
 
-        // leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         rightMotor1.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
         rightMotor2.setDirection(DcMotor.Direction.REVERSE);
     }
 
     public void linearSlidesInit() {
+
         leftLinearSlide = hardwareMap.dcMotor.get("left linear slide");
         rightLinearSlide = hardwareMap.dcMotor.get("right linear slide");
 
-        rightLinearSlide.setDirection(DcMotor.Direction.REVERSE);
+        leftLinearSlide.setDirection(DcMotor.Direction.REVERSE);
     }
 
     public void armServosInit() {
+
         leftArmServo = hardwareMap.servo.get("left arm servo");
-        //rightArmServo = hardwareMap.servo.get("right arm servo");
+        leftArmServo.setPosition(.2);
+    }
 
-        //leftArmServo.setDirection(Servo.Direction.REVERSE);
+    public void launchMotorInit() {
 
-        //rightArmServo.setPosition(.875);
-        //leftArmServo.setPosition(.875);
-        leftArmServo.setPosition(0);
+        launchMotor = hardwareMap.dcMotor.get("launch motor");
+
+        launchMotor.setTargetPosition(0);
+    }
+
+    public void launchServoInit() {
+
+        launchServo = hardwareMap.servo.get("launch servo");
+        launchServo.setPosition(0);
     }
 
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
+
         driveInit();
         linearSlidesInit();
         armServosInit();
+//        launchMotorInit();
+//        launchServoInit();
     }
 
 
@@ -69,9 +84,7 @@ public class TitanTest extends OpMode
      * Code to run ONCE when the driver hits PLAY
      */
     @Override
-    public void start() {
-        runtime.reset();
-    }
+    public void start() {runtime.reset();}
 
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
@@ -79,10 +92,21 @@ public class TitanTest extends OpMode
 
     public void driveLoop() {
 
-        leftMotor1.setPower(-gamepad1.left_stick_y);
-        leftMotor2.setPower(-gamepad1.left_stick_y);
-        rightMotor1.setPower(-gamepad1.right_stick_y);
-        rightMotor2.setPower(-gamepad1.right_stick_y);
+        if (gamepad1.right_trigger > 0) {
+            leftMotor1.setPower((-gamepad1.left_stick_y) / 2);
+            leftMotor2.setPower((-gamepad1.left_stick_y) / 2);
+            rightMotor1.setPower((-gamepad1.right_stick_y) / 2);
+            rightMotor2.setPower((-gamepad1.right_stick_y) / 2);
+        } else {
+            leftMotor1.setPower(-gamepad1.left_stick_y);
+            leftMotor2.setPower(-gamepad1.left_stick_y);
+            rightMotor1.setPower(-gamepad1.right_stick_y);
+            rightMotor2.setPower(-gamepad1.right_stick_y);
+        }
+        telemetry.addData("left1", leftMotor2.getPower());
+        telemetry.addData("left2", leftMotor1.getPower());
+        telemetry.addData("right1", rightMotor1.getPower());
+        telemetry.addData("right2", rightMotor2.getPower());
 
     }
 
@@ -94,30 +118,51 @@ public class TitanTest extends OpMode
     }
 
     public void armServosLoop() {
-        /*if (gamepad2.right_bumper) {
-            if ((leftArmServo.getPosition() != 0) && (rightArmServo.getPosition() != 0)) {
-                leftArmServo.setPosition(0);
-                rightArmServo.setPosition(0);
-            }
-        } else {
-            if ((leftArmServo.getPosition() != .875) && (rightArmServo.getPosition() != .875)) {
-                leftArmServo.setPosition(.875);
-                rightArmServo.setPosition(.875);
-            }
-        }
-        */
+
         if (gamepad2.right_bumper) {
             if (leftArmServo.getPosition() != 1) {
                 leftArmServo.setPosition(1);
-            } else {
-                if (leftArmServo.getPosition() != 0) {
-                    leftArmServo.setPosition(0);
-                }
+            }
+        } else {
+            if (leftArmServo.getPosition() != .2) {
+                leftArmServo.setPosition(.2);
             }
         }
 
         telemetry.addData("Left Servo Pos: ", leftArmServo.getPosition());
-        telemetry.addData("Right Servo Pos: ", rightArmServo.getPosition());
+    }
+
+    public void launchMotorLoop() {
+
+        /*
+        * This block is going to make the launch motor move 2 rotation on each press of the button allegedly
+        */
+
+        if (gamepad2.a) {
+            //launchMotor.setPower(1);
+            /*
+            *This may work, but highly unlikely
+            */
+            int launchMotorPos = launchMotor.getCurrentPosition();
+            launchMotorPos = launchMotorPos + 6000;
+            launchMotor.setTargetPosition(launchMotorPos);
+        } else {
+            launchMotor.setPower(0);
+        }
+
+        telemetry.addData("Launch Motor Power:", launchMotor.getPower());
+        telemetry.addData("Launch Motor Position:", launchMotor.getCurrentPosition());
+    }
+
+    public void launchServoLoop() {
+
+        if (gamepad2.b) {
+            if (launchServo.getPosition() != 1) {
+                launchServo.setPosition(1);
+            }
+        }
+
+        telemetry.addData("Launch Servo", launchServo.getPosition());
     }
 
     @Override
@@ -127,13 +172,20 @@ public class TitanTest extends OpMode
         driveLoop();
         linearSlidesLoop();
         armServosLoop();
+//        launchMotorLoop();
+//        launchServoLoop();
     }
 
     /*
      * Code to run ONCE after the driver hits STOP
-hggh     */
+     */
     @Override
     public void stop() {
+        /*
+        * This is going to reset the Servo Position when the program stops
+        */
+        //launchServo.setPosition(0);
+
     }
 
 }

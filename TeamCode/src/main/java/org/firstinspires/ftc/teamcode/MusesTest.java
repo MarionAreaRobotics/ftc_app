@@ -42,13 +42,17 @@ public class MusesTest extends OpMode {
         //harvesterMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 
+    public void stopbarInit() {
+        stopBarServo = hardwareMap.servo.get("stopbar");
+        stopBarServo.setPosition(1);
+    }
+
     @Override
     public void init() {
         driveInit();
         scoringInit();
         harvesterInit();
-        stopBarServo = hardwareMap.servo.get("stopbar");
-        stopBarServo.setPosition(0);
+        stopbarInit();
     }
 
     @Override
@@ -101,21 +105,26 @@ public class MusesTest extends OpMode {
         leftMotor2.setPower(coord1);
         rightMotor1.setPower(coord);
         rightMotor2.setPower(coord);
+        telemetry.addData("RightX", gamepad1.right_stick_x);
+        telemetry.addData("RightY", gamepad1.right_stick_y);
+        telemetry.addData("LeftX", gamepad1.left_stick_x);
+        telemetry.addData("LeftY", gamepad1.left_stick_y);
+
+        //float leftX = -gamepad1.left_stick_x;// assigning controller values to a variable
+        //switch the directions on the auto
     }
 
     public void scoringLoop() {
+
         scoringMotor.setPower(gamepad2.left_stick_y);
     }
 
     public void harvesterLoop() {
+
         harvesterMotor.setPower(gamepad2.right_stick_y);
     }
 
-    @Override
-    public void loop() {
-        driveLoop();
-        scoringLoop();
-        harvesterLoop();
+    public void stopbarLoop() {
         telemetry.addData("x",gamepad2.right_bumper);
         telemetry.addData("position",stopBarServo.getPosition());
         if (gamepad2.right_bumper) {
@@ -127,6 +136,14 @@ public class MusesTest extends OpMode {
                 stopBarServo.setPosition(0);
             }
         }
+    }
+
+    @Override
+    public void loop() {
+        driveLoop();
+        scoringLoop();
+        harvesterLoop();
+        stopbarLoop();
     }
 
     /*
