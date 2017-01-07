@@ -92,7 +92,7 @@ public class BeaconAuto extends OpMode {
             move(0); //stop
         }
 
-//For Testing Purposes, I am removing this code to see our margin of Error and to see whether or not it is consistent
+        //For Testing Purposes, I am removing this code to see our margin of Error and to see whether or not it is consistent
 /*        if (crossedTheLine > 0) {
             if (currentPos == crossedTheLine) {
                 move(0); //stop

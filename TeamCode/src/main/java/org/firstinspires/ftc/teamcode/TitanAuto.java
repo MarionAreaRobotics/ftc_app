@@ -36,6 +36,8 @@ public class TitanAuto extends OpMode {
     @Override
     public void loop() {
 
+        //Need to add in a launcher using a motor, one rotation. Then work on Beacons maybe
+        
         telemetry.addData("Left 1: ", leftMotor1.getCurrentPosition());
         telemetry.addData("Left 2: ", leftMotor2.getCurrentPosition());
         telemetry.addData("Right 1: ", rightMotor1.getCurrentPosition());
@@ -53,7 +55,6 @@ public class TitanAuto extends OpMode {
             rightMotor2.setPower(.5);
         }
 
-
         //int motorPos = leftMotor1.getCurrentPosition();
         //int newMotorPos = motorPos + 3500;
 
@@ -63,7 +64,7 @@ public class TitanAuto extends OpMode {
             rightMotor1.setPower(.3);
             rightMotor2.setPower(.3);
         }
-        /*
+
         if (leftMotor1.getCurrentPosition() >= 3500) {
             leftMotor1.setPower(0);
             leftMotor2.setPower(0);

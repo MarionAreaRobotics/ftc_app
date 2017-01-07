@@ -63,6 +63,16 @@ public class MusesAuto extends OpMode {
         telemetry.addData("OpRawLight: ", distance.getRawLightDetected());
         telemetry.addData("OpRawLightMax: ", distance.getRawLightDetectedMax());
 
+        /* Couldn't you have just done this and then only used 1 program instead of two different ones?
+        if (distance.getRawLightDetected() >= 0.09) {
+            servo.setPosition(1);
+        } else {
+            if (distance.getRawLightDetected() < 0.19) {
+                servo.setPosition(0);
+            }
+        }
+        */
+
         if (distance.getRawLightDetected() >= 0.19) {
             servo.setPosition(1);
         } else {

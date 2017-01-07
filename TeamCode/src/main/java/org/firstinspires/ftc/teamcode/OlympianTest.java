@@ -25,7 +25,6 @@ public class OlympianTest extends OpMode {
 
     public void driveInit() {
         telemetry.addData("Status", "Initialized");
-
         leftMotor1 = hardwareMap.dcMotor.get("left motor 1");
         leftMotor2 = hardwareMap.dcMotor.get("left motor 2");
         rightMotor1 = hardwareMap.dcMotor.get("right motor 1");
