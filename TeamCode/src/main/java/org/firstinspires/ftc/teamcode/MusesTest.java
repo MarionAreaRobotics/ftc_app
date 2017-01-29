@@ -4,21 +4,30 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="Muses", group="Testing")
 public class MusesTest extends OpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
+
     private DcMotor leftMotor1 = null;
     private DcMotor leftMotor2 = null;
     private DcMotor rightMotor1 = null;
     private DcMotor rightMotor2 = null;
+
     private DcMotor scoringMotor = null;
+
     private DcMotor harvesterMotor = null;
+
     private Servo stopBarServo = null;
 
+    private TouchSensor button = null;
+
     private double motorThreshold = 0.065;
+
+    private Servo capServo = null;
 
     public void driveInit() {
         telemetry.addData("Status", "Initialized");
@@ -44,7 +53,16 @@ public class MusesTest extends OpMode {
 
     public void stopbarInit() {
         stopBarServo = hardwareMap.servo.get("stopbar");
-        stopBarServo.setPosition(1);
+        stopBarServo.setPosition(.6);
+    }
+
+    /*public void touchInit() {
+        button = hardwareMap.touchSensor.get("button");
+    }*/
+
+    public void capInit() {
+        capServo = hardwareMap.servo.get("cap");
+        capServo.setPosition(1);
     }
 
     @Override
@@ -53,6 +71,8 @@ public class MusesTest extends OpMode {
         scoringInit();
         harvesterInit();
         stopbarInit();
+        //touchInit();
+        capInit();
     }
 
     @Override
@@ -126,14 +146,33 @@ public class MusesTest extends OpMode {
 
     public void stopbarLoop() {
         telemetry.addData("x",gamepad2.right_bumper);
-        telemetry.addData("position",stopBarServo.getPosition());
+        telemetry.addData("position Stopbar",stopBarServo.getPosition());
         if (gamepad2.right_bumper) {
-            if (stopBarServo.getPosition() != 1) {
-                stopBarServo.setPosition(1);
-            }
-        } else {
             if (stopBarServo.getPosition() != 0) {
                 stopBarServo.setPosition(0);
+            }
+        } else {
+            if (stopBarServo.getPosition() != .6) {
+                stopBarServo.setPosition(.6);
+            }
+        }
+    }
+
+    /*public void touchLoop() {
+        telemetry.addData("Button Pressed: ", button.isPressed());
+        telemetry.addData("Button Value: ", button.getValue());
+    }*/
+
+    public void capLoop() {
+        telemetry.addData("y", gamepad1.left_bumper);
+        telemetry.addData("position Capbar", capServo.getPosition());
+        if (gamepad1.left_bumper) {
+            if (capServo.getPosition() != 0) {
+                capServo.setPosition(0);
+            }
+        } else {
+            if (capServo.getPosition() != .7) {
+                capServo.setPosition(.7);
             }
         }
     }
@@ -144,6 +183,8 @@ public class MusesTest extends OpMode {
         scoringLoop();
         harvesterLoop();
         stopbarLoop();
+        //touchLoop();
+        capLoop();
     }
 
     /*
