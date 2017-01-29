@@ -72,7 +72,7 @@ public class OlympianTest extends OpMode {
 
     public void armReleaseInit() {
         armRelease = hardwareMap.servo.get("arm release");
-        armRelease.setPosition(0);
+        armRelease.setPosition(1);
     }
 
     public void launcherServoInit() {
@@ -105,9 +105,9 @@ public class OlympianTest extends OpMode {
         runtime.reset();
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
-     */
+   /*
+    * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
+    */
 
     public void driveLoop() {
         // Driving control "telemetry"
@@ -146,7 +146,18 @@ public class OlympianTest extends OpMode {
     }
 
     public void armReleaseLoop() {
-        if (gamepad1.y) {
+
+        if (gamepad1.y || gamepad2.y) {
+            if (armRelease.getPosition() != 0) {
+                armRelease.setPosition(0);
+            }
+        } else {
+            if (armRelease.getPosition() != 1) {
+                armRelease.setPosition(1);
+            }
+        }
+
+     /*   if (gamepad1.y) {
 
             if (gamepad1.y) {
                 if (armRelease.getPosition() != 1) {
@@ -170,34 +181,34 @@ public class OlympianTest extends OpMode {
                 }
             }
 
-        }
+        } */
     }
 
 
-      /*      if (armRelease.getPosition() != 1) {
-                armRelease.setPosition(1);
-            }
-        } else {
-            if (armRelease.getPosition() != 0) {
-                armRelease.setPosition(0);
-            }
-        } */
+     /*      if (armRelease.getPosition() != 1) {
+               armRelease.setPosition(1);
+           }
+       } else {
+           if (armRelease.getPosition() != 0) {
+               armRelease.setPosition(0);
+           }
+       } */
 
 
     public void gateServoLoop() {
 
-       /* if (gamepad1.a || gamepad2.a) {
-            if (gateServo1.getPosition() != 1) {
-                gateServo1.setPosition(1);
-            }
-        } else {
-            if (gateServo1.getPosition() != 0) {
-                gateServo1.setPosition(0);
-            }
-        }  */
+       if (gamepad1.a || gamepad2.a) {
+           if (gateServo1.getPosition() != 1) {
+               gateServo1.setPosition(1);
+           }
+       } else {
+           if (gateServo1.getPosition() != 0) {
+               gateServo1.setPosition(0);
+           }
+       }
 
-//----------------------------------------------------------------------------------------------------------------
-        if (gamepad1.a) {
+//--------------------------------------------------------------------------------------------------
+   /*     if (gamepad1.a) {
 
             if (gamepad1.a) {
                 if (gateServo1.getPosition() != 1) {
@@ -219,45 +230,52 @@ public class OlympianTest extends OpMode {
                     gateServo1.setPosition(0);
 
                 }
-            }
-
-        }
+            } */
 
 
-        /*
-        if (gamepad2.dpad_up) {
-            contServo.setPosition(1);
-        } else if (gamepad2.dpad_down) {
-            contServo.setPosition(0);
-        if (servo.getPosition() == 1) {
-            scoringMotor.setPower(1);
-        }
 
-        if (servo.getPosition() == 0) {
 
-        } else
-            contServo.setPosition(0.5);
-        }
-        */
+       /*
+       if (gamepad2.dpad_up) {
+           contServo.setPosition(1);
+       } else if (gamepad2.dpad_down) {
+           contServo.setPosition(0);
+       if (servo.getPosition() == 1) {
+           scoringMotor.setPower(1);
+       }
+
+       if (servo.getPosition() == 0) {
+
+       } else
+           contServo.setPosition(0.5);
+       }
+       */
     }
 
     public void lifterMotorLoop() {
-      /*  if (gamepad1.dpad_up || gamepad2.dpad_up) {
-            lifterMotor.setPower(.5);
+ /*       if (gamepad1.dpad_up || gamepad2.dpad_up) {
+            lifterMotor.setPower(.8);
+        } else if (gamepad1.dpad_down || gamepad2.dpad_down) {
+           lifterMotor.setPower(-.5);
+        } else {
+           lifterMotor.setPower(0);
+        }
+*/
+        telemetry.addData("right trigger", gamepad1.right_trigger);
+        telemetry.addData("left trigger", gamepad1.left_trigger);
+
+        if(gamepad1.right_trigger > 0) {
+            lifterMotor.setPower(gamepad1.right_trigger);
+
+        } else if (gamepad1.left_trigger > 0) {
+            lifterMotor.setPower(-gamepad1.left_trigger);
 
         } else {
             lifterMotor.setPower(0);
         }
+//--------------------------------------------------------------------------------------------------
 
-        if (gamepad1.dpad_down || gamepad2.dpad_down) {
-            lifterMotor.setPower(-.5);
-
-        } else {
-            lifterMotor.setPower(0);
-        } */
-//---------------------------------------------------------------------------------------------------------------
-
-        if (gamepad1.dpad_up) {
+    /*    if (gamepad1.dpad_up) {
 
             if (gamepad1.dpad_up) {
                 lifterMotor.setPower(.5);
@@ -271,26 +289,26 @@ public class OlympianTest extends OpMode {
                 lifterMotor.setPower(0);
             }
 
-        }
+        } */
 
     }
 
     public void pushBarServoLoop() {
-     /*   if (gamepad1.left_bumper || gamepad2.left_bumper) {
-            if (pushbarServo1.getPosition() != .7) {
-                pushbarServo1.setPosition(.7);
-                pushbarServo2.setPosition(.7);
-            }
-        } else {
-            if (pushbarServo1.getPosition() != 0) {
-                pushbarServo1.setPosition(0);
-                pushbarServo2.setPosition(0);
-            }
-        } */
+       if (gamepad1.left_bumper || gamepad2.left_bumper) {
+           if (pushbarServo1.getPosition() != .7) {
+               pushbarServo1.setPosition(.7);
+               pushbarServo2.setPosition(.7);
+           }
+       } else {
+           if (pushbarServo1.getPosition() != 0) {
+               pushbarServo1.setPosition(0);
+               pushbarServo2.setPosition(0);
+           }
+       }
 
-//----------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
-        if (gamepad1.left_bumper) {
+     /*   if (gamepad1.left_bumper) {
 
             if (gamepad1.left_bumper) {
                 if (pushbarServo1.getPosition() != .7) {
@@ -317,7 +335,7 @@ public class OlympianTest extends OpMode {
                 }
             }
 
-        }
+        } */
 
     }
 
@@ -339,7 +357,7 @@ public class OlympianTest extends OpMode {
             launcherMotor2.setPower(0);
         }
     }
-*/
+ */
     @Override
     public void loop() {
         driveLoop();
@@ -357,3 +375,4 @@ public class OlympianTest extends OpMode {
     }
 
 }
+
