@@ -10,22 +10,34 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class OlympianTest extends OpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
+
     private DcMotor leftMotor1 = null;
     private DcMotor leftMotor2 = null;
     private DcMotor rightMotor1 = null;
     private DcMotor rightMotor2 = null;
+
+    private DcMotor lifterMotor = null;
+
     private Servo gateServo1 = null;
     //private Servo gateServo2 = null;
+
+    private Servo launcherServo = null;
+
     private Servo pushbarServo1 = null;
     private Servo pushbarServo2 = null;
+
+    private Servo armRelease = null;
+
+
     //private DcMotor harvesterMotor = null;
-    private DcMotor launcherMotor1 = null;
-    private DcMotor launcherMotor2 = null;
+
+    //private DcMotor launcherMotor1 = null;
+    //private DcMotor launcherMotor2 = null;
+
     private double motorThreshold = 0.065;
 
     public void driveInit() {
         telemetry.addData("Status", "Initialized");
-
         leftMotor1 = hardwareMap.dcMotor.get("left motor 1");
         leftMotor2 = hardwareMap.dcMotor.get("left motor 2");
         rightMotor1 = hardwareMap.dcMotor.get("right motor 1");
@@ -49,8 +61,23 @@ public class OlympianTest extends OpMode {
         pushbarServo2.setPosition(0);
     }
     public void launcherInit() {
-        launcherMotor1 = hardwareMap.dcMotor.get("launcher motor 1");
-        launcherMotor2 = hardwareMap.dcMotor.get("launcher motor 2");
+        //launcherMotor1 = hardwareMap.dcMotor.get("launcher motor 1");
+        //launcherMotor2 = hardwareMap.dcMotor.get("launcher motor 2");
+    }
+
+    public void lifterMotorInit() {
+
+        lifterMotor = hardwareMap.dcMotor.get("lifter motor");
+    }
+
+    public void armReleaseInit() {
+        armRelease = hardwareMap.servo.get("arm release");
+        armRelease.setPosition(1);
+    }
+
+    public void launcherServoInit() {
+
+        launcherServo = hardwareMap.servo.get("launcher servo");
     }
 
     @Override
@@ -59,6 +86,9 @@ public class OlympianTest extends OpMode {
         driveInit();
         gateServoInit();
         pushbarServoInit();
+        launcherServoInit();
+        armReleaseInit();
+        lifterMotorInit();
         //launcherInit();
     }
 
@@ -75,9 +105,9 @@ public class OlympianTest extends OpMode {
         runtime.reset();
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
-     */
+   /*
+    * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
+    */
 
     public void driveLoop() {
         // Driving control "telemetry"
@@ -88,7 +118,7 @@ public class OlympianTest extends OpMode {
         telemetry.addData("LeftY", gamepad1.left_stick_y);
 
         float leftX = -gamepad1.left_stick_x;// assigning controller values to a variable
-        float rightX = -gamepad1.right_stick_x;
+        float rightX = gamepad1.right_stick_x;
         float leftY = -gamepad1.left_stick_y;
         float rightY = -gamepad1.right_stick_y;
 
@@ -115,48 +145,201 @@ public class OlympianTest extends OpMode {
         //switch the directions on the auto
     }
 
-    public void gateServoLoop() {
+    public void armReleaseLoop() {
 
-        if (gamepad1.a) {
-            if (gateServo1.getPosition() != 1) {
-                gateServo1.setPosition(1);
+        if (gamepad1.y || gamepad2.y) {
+            if (armRelease.getPosition() != 0) {
+                armRelease.setPosition(0);
             }
         } else {
-            if (gateServo1.getPosition() != 0) {
-                gateServo1.setPosition(0);
+            if (armRelease.getPosition() != 1) {
+                armRelease.setPosition(1);
             }
         }
 
-        /*
-        if (gamepad2.dpad_up) {
-            contServo.setPosition(1);
+     /*   if (gamepad1.y) {
+
+            if (gamepad1.y) {
+                if (armRelease.getPosition() != 1) {
+                    armRelease.setPosition(1);
+                }
+            } else {
+                if (armRelease.getPosition() != 0) {
+                    armRelease.setPosition(0);
+
+                }
+            }
+        } else if (gamepad2.y) {
+            if (gamepad2.y) {
+                if (armRelease.getPosition() != 1) {
+                    armRelease.setPosition(1);
+                }
+            } else {
+                if (armRelease.getPosition() != 0) {
+                    armRelease.setPosition(0);
+
+                }
+            }
+
+        } */
+    }
+
+
+     /*      if (armRelease.getPosition() != 1) {
+               armRelease.setPosition(1);
+           }
+       } else {
+           if (armRelease.getPosition() != 0) {
+               armRelease.setPosition(0);
+           }
+       } */
+
+
+    public void gateServoLoop() {
+
+       if (gamepad1.a || gamepad2.a) {
+           if (gateServo1.getPosition() != 1) {
+               gateServo1.setPosition(1);
+           }
+       } else {
+           if (gateServo1.getPosition() != 0) {
+               gateServo1.setPosition(0);
+           }
+       }
+
+//--------------------------------------------------------------------------------------------------
+   /*     if (gamepad1.a) {
+
+            if (gamepad1.a) {
+                if (gateServo1.getPosition() != 1) {
+                    gateServo1.setPosition(1);
+                }
+            } else {
+                if (gateServo1.getPosition() != 0) {
+                    gateServo1.setPosition(0);
+
+                }
+            }
+        } else if (gamepad2.a) {
+            if (gamepad2.a) {
+                if (gateServo1.getPosition() != 1) {
+                    gateServo1.setPosition(1);
+                }
+            } else {
+                if (gateServo1.getPosition() != 0) {
+                    gateServo1.setPosition(0);
+
+                }
+            } */
+
+
+
+
+       /*
+       if (gamepad2.dpad_up) {
+           contServo.setPosition(1);
+       } else if (gamepad2.dpad_down) {
+           contServo.setPosition(0);
+       if (servo.getPosition() == 1) {
+           scoringMotor.setPower(1);
+       }
+
+       if (servo.getPosition() == 0) {
+
+       } else
+           contServo.setPosition(0.5);
+       }
+       */
+    }
+
+    public void lifterMotorLoop() {
+ /*       if (gamepad1.dpad_up || gamepad2.dpad_up) {
+            lifterMotor.setPower(.8);
+        } else if (gamepad1.dpad_down || gamepad2.dpad_down) {
+           lifterMotor.setPower(-.5);
+        } else {
+           lifterMotor.setPower(0);
+        }
+*/
+        telemetry.addData("right trigger", gamepad1.right_trigger);
+        telemetry.addData("left trigger", gamepad1.left_trigger);
+
+        if(gamepad1.right_trigger > 0) {
+            lifterMotor.setPower(gamepad1.right_trigger);
+
+        } else if (gamepad1.left_trigger > 0) {
+            lifterMotor.setPower(-gamepad1.left_trigger);
+
+        } else {
+            lifterMotor.setPower(0);
+        }
+//--------------------------------------------------------------------------------------------------
+
+    /*    if (gamepad1.dpad_up) {
+
+            if (gamepad1.dpad_up) {
+                lifterMotor.setPower(.5);
+            } else {
+                lifterMotor.setPower(0);
+            }
         } else if (gamepad2.dpad_down) {
-            contServo.setPosition(0);
-        if (servo.getPosition() == 1) {
-            scoringMotor.setPower(1);
-        }
+            if (gamepad2.dpad_down) {
+                lifterMotor.setPower(-.5);
+            } else {
+                lifterMotor.setPower(0);
+            }
 
-        if (servo.getPosition() == 0) {
+        } */
 
-        } else
-            contServo.setPosition(0.5);
-        }
-        */
     }
 
     public void pushBarServoLoop() {
-        if (gamepad1.left_bumper) {
-            if (pushbarServo1.getPosition() != .7) {
-                pushbarServo1.setPosition(.7);
-                pushbarServo2.setPosition(.7);
+       if (gamepad1.left_bumper || gamepad2.left_bumper) {
+           if (pushbarServo1.getPosition() != .7) {
+               pushbarServo1.setPosition(.7);
+               pushbarServo2.setPosition(.7);
+           }
+       } else {
+           if (pushbarServo1.getPosition() != 0) {
+               pushbarServo1.setPosition(0);
+               pushbarServo2.setPosition(0);
+           }
+       }
+
+//--------------------------------------------------------------------------------------------------
+
+     /*   if (gamepad1.left_bumper) {
+
+            if (gamepad1.left_bumper) {
+                if (pushbarServo1.getPosition() != .7) {
+                    pushbarServo1.setPosition(.7);
+                    pushbarServo2.setPosition(.7);
+                }
+
+            } else {
+                if (pushbarServo1.getPosition() != 0) {
+                    pushbarServo1.setPosition(0);
+                    pushbarServo2.setPosition(0);
+                }
             }
-        } else {
-            if (pushbarServo1.getPosition() != 0) {
-                pushbarServo1.setPosition(0);
-                pushbarServo2.setPosition(0);
+        } else if (gamepad2.left_bumper) {
+            if (gamepad2.left_bumper) {
+                if (pushbarServo1.getPosition() != .7) {
+                    pushbarServo1.setPosition(.7);
+                    pushbarServo2.setPosition(.7);
+                }
+            } else {
+                if (pushbarServo1.getPosition() != 0) {
+                    pushbarServo1.setPosition(0);
+                    pushbarServo2.setPosition(0);
+                }
             }
-        }
+
+        } */
+
     }
+
+
 
     /*public void launcherLoop(){
         if (gamepad2.right_trigger > 0) {
@@ -174,12 +357,14 @@ public class OlympianTest extends OpMode {
             launcherMotor2.setPower(0);
         }
     }
-*/
+ */
     @Override
     public void loop() {
         driveLoop();
         gateServoLoop();
         pushBarServoLoop();
+        armReleaseLoop();
+        lifterMotorLoop();
         //launcherLoop();
     }
     /*
@@ -190,3 +375,4 @@ public class OlympianTest extends OpMode {
     }
 
 }
+
