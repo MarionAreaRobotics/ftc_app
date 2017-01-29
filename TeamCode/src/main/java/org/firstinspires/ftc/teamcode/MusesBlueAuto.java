@@ -51,6 +51,7 @@ public class MusesBlueAuto extends OpMode {
             }
         }
     }
+
     @Override
     public void stop() {
 

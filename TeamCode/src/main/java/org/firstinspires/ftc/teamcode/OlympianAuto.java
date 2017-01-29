@@ -4,9 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-/**
- * Created by mars on 10/30/16.
- */
 @Autonomous(name="OlympianAuto", group="Auto")
 public class OlympianAuto extends OpMode {
 
