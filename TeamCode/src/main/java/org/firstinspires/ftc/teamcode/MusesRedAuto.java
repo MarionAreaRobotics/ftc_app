@@ -10,9 +10,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 /**
  * Created by mars on 11/2/17.
  */
-
-@Autonomous(name="Muses Blue Auto", group="Testing")
-public class MusesBlueAuto extends OpMode {
+//COLOR SENSOR FACES THE BACK
+@Autonomous(name="Muses Red Auto", group="Testing")
+public class MusesRedAuto extends OpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -86,6 +86,7 @@ public class MusesBlueAuto extends OpMode {
         jewelServo = hardwareMap.servo.get("jewel servo");
         jewelServo.setDirection(Servo.Direction.REVERSE);
         jewelServo.setPosition(0);
+
     }
 
     public void colorInit() {
@@ -131,9 +132,9 @@ public class MusesBlueAuto extends OpMode {
             jewelServo.setPosition(1);
             tracker = 1;
         } else if (tracker == 1) {
-            if (color.blue() >= 50) { // Blue is detected
+            if (color.red() >= 50) { // Red is detected
                 move(-.3);
-            } else if (color.red() >= 50) { // Red is detected
+            } else if (color.blue() >= 50) { // Blue is detected
                 move(.3);
             } else {
                 move(0);

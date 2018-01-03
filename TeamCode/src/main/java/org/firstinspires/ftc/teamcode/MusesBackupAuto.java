@@ -1,20 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.configuration.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
- * Created by mars on 11/11/17.
+ * Created by mars on 12/16/17.
  */
-@Autonomous(name = "Backup Auto", group = "Testing")
-public class TitanAuto extends OpMode {
+@Autonomous(name = "Muses Backup Auto", group = "Testing")
+public class MusesBackupAuto extends OpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -83,9 +78,9 @@ public class TitanAuto extends OpMode {
     @Override
     public void loop() {
 
-        if (tracker == 0 && leftMotor1.getCurrentPosition() <= 3000) {
+        if (tracker == 0 && leftMotor1.getCurrentPosition() <= 100) {
             move(.3);
-        } else if (tracker == 0 && leftMotor1.getCurrentPosition() >= 3000){
+        } else if (tracker == 0 && leftMotor1.getCurrentPosition() >= 100){
             move(0);
             tracker = 1;
         }

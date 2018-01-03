@@ -1,59 +1,77 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
- * Created by mars on 12/10/16.
+ * Created by mars on 10/27/17.
  */
-@Autonomous(name="Encoders", group="Auto")
+@Disabled
+@TeleOp(name="Encoder", group ="Testing")
 public class EncoderTest extends OpMode {
 
-    private DcMotor leftMotor1 = null;
-    private DcMotor leftMotor2 = null;
-    private DcMotor rightMotor1 = null;
-    private DcMotor rightMotor2 = null;
+    private DcMotor spinnerMotor = null;
+
+    int currentPosition = 0;
+    int newPosition = 0;
 
     @Override
     public void init() {
 
-        leftMotor1  = hardwareMap.dcMotor.get("left motor 1");
-        leftMotor2  = hardwareMap.dcMotor.get("left motor 2");
-        rightMotor1 = hardwareMap.dcMotor.get("right motor 1");
-        rightMotor2 = hardwareMap.dcMotor.get("right motor 2");
-        leftMotor1.setDirection(DcMotor.Direction.REVERSE);
-        leftMotor2.setDirection(DcMotor.Direction.REVERSE);
-
-        leftMotor1.setTargetPosition(0);
-        leftMotor2.setTargetPosition(0);
-        rightMotor1.setTargetPosition(0);
-        rightMotor2.setTargetPosition(0);
+        spinnerMotor = hardwareMap.dcMotor.get("spinner motor");
     }
 
     @Override
     public void loop() {
 
-        if (leftMotor1.getCurrentPosition() >= 10000) {
-            leftMotor1.setPower(-1);
-            leftMotor2.setPower(-1);
-            rightMotor1.setPower(-1);
-            rightMotor2.setPower(-1);
+        telemetry.addData("spinnerMotor Position: ", spinnerMotor.getCurrentPosition());
+        telemetry.addData("spinnerMotor Power: ", spinnerMotor.getPower());
+        telemetry.addData("Button A: ", gamepad1.a);
+        telemetry.addData("Button B: ", gamepad1.b);
+
+        telemetry.addData("Current Position: ", currentPosition);
+        telemetry.addData("New Position: ", newPosition);
+
+        if ((spinnerMotor.getCurrentPosition() < newPosition) && (spinnerMotor.getCurrentPosition() >= currentPosition)) {
+            telemetry.addLine("YOU THOUGHT");
+            if (currentPosition >= newPosition) {
+                spinnerMotor.setPower(0);
+            }  else {
+                spinnerMotor.setPower(1);
+            }
+        } else if ((spinnerMotor.getCurrentPosition() > newPosition) && (spinnerMotor.getCurrentPosition() <= currentPosition)) {
+            telemetry.addLine("YOU THOUGHT");
+            if (currentPosition <= newPosition) {
+                spinnerMotor.setPower(0);
+            } else {
+                spinnerMotor.setPower(-1);
+            }
         } else {
-            leftMotor1.setPower(1);
-            leftMotor2.setPower(1);
-            rightMotor1.setPower(1);
-            rightMotor2.setPower(1);
+            if (gamepad1.a) {
+                currentPosition = spinnerMotor.getCurrentPosition();
+                newPosition = currentPosition + 900;
+            }  else if (gamepad1.b) {
+                currentPosition = spinnerMotor.getCurrentPosition();
+                newPosition = currentPosition - 900;
+            } else {
+                spinnerMotor.setPower(0);
+                telemetry.addLine("YOU THOUGHT AGAIN");
+            }
         }
 
-        telemetry.addData("Left 1: ", leftMotor1.getCurrentPosition());
-        telemetry.addData("Left 2: ", leftMotor2.getCurrentPosition());
-        telemetry.addData("Right 1: ", rightMotor1.getCurrentPosition());
-        telemetry.addData("Right 2: ", rightMotor2.getCurrentPosition());
-    }
 
-    @Override
-    public void stop() {
+
+        /*
+        if (spinnerMotor.getCurrentPosition() <= 1000) {
+            spinnerMotor.setPower(1);
+        } else if (spinnerMotor.getCurrentPosition() <= 10000) {
+            spinnerMotor.setPower(.5);
+        } else {
+            spinnerMotor.setPower(0);
+        }
+        */
 
     }
 }
