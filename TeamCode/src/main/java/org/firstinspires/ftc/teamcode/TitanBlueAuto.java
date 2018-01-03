@@ -11,8 +11,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Created by mars on 11/2/17.
  */
 
-@Autonomous(name="Muses Blue Auto", group="Testing")
-public class MusesBlueAuto extends OpMode {
+@Autonomous(name="Titan Blue Auto", group="Testing")
+public class TitanBlueAuto extends OpMode {
+
+    /*Change this to go forward at least, need to do more debugging*/
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -21,10 +23,9 @@ public class MusesBlueAuto extends OpMode {
     private DcMotor rightMotor1 = null;
     private DcMotor rightMotor2 = null;
 
-    private Servo bucketServo1 = null;
-    private Servo bucketServo2 = null;
+    private DcMotor glyphArmMotor = null;
 
-    private Servo jewelServo = null;
+    private Servo jouleThiefServo = null;
 
     private ColorSensor color = null;
 
@@ -36,15 +37,14 @@ public class MusesBlueAuto extends OpMode {
 
     public void telemetrys() {
 
-        telemetry.addData("LeftMotor1 Power ", leftMotor1.getPower());
-        telemetry.addData("LeftMotor2 Power ", leftMotor2.getPower());
-        telemetry.addData("RightMotor1 Power ", rightMotor1.getPower());
-        telemetry.addData("RightMotor2 Power ", rightMotor2.getPower());
+        telemetry.addData("Left Motor 1 Position: ", leftMotor1.getCurrentPosition());
+        telemetry.addData("Left Motor 2 Position: ", leftMotor2.getCurrentPosition());
+        telemetry.addData("Right Motor 1 Position: ", rightMotor1.getCurrentPosition());
+        telemetry.addData("Right Motor 2 Position: ", rightMotor2.getCurrentPosition());
 
-        telemetry.addData("Bucket Servo 1 Position: ", bucketServo1.getPosition());
-        telemetry.addData("Bucket Servo 2 Position: ", bucketServo2.getPosition());
+        telemetry.addData("Glyph Arm Motor Position: ", glyphArmMotor.getCurrentPosition());
 
-        telemetry.addData("jewel Servo Position: ", jewelServo.getPosition());
+        telemetry.addData("Joule Thief Servo Position: ", jouleThiefServo.getPosition());
 
         telemetry.addData("Color Alpha: ", color.alpha());
         telemetry.addData("Color Red: ", color.red());
@@ -52,7 +52,6 @@ public class MusesBlueAuto extends OpMode {
         telemetry.addData("Color Green: ", color.green());
 
         telemetry.addData("Tracker: ", tracker);
-
         telemetry.update();
     }
 
@@ -72,20 +71,17 @@ public class MusesBlueAuto extends OpMode {
         motorBrake(rightMotor2);
     }
 
-    public void bucketServoInit() {
+    public void glyphArmInit() {
 
-        bucketServo1 = hardwareMap.servo.get("bucket servo 1");
-        bucketServo2 = hardwareMap.servo.get("bucket servo 2");
+        glyphArmMotor = hardwareMap.dcMotor.get("glyph arm");
 
-        bucketServo1.setPosition(.5);
-        bucketServo2.setPosition(.5);
+        motorBrake(glyphArmMotor);
     }
 
-    public void jewelServoInit() {
+    public void jouleThiefInit() {
 
-        jewelServo = hardwareMap.servo.get("jewel servo");
-        jewelServo.setDirection(Servo.Direction.REVERSE);
-        jewelServo.setPosition(0);
+        jouleThiefServo= hardwareMap.servo.get("joule thief");
+        jouleThiefServo.setPosition(0);
     }
 
     public void colorInit() {
@@ -97,9 +93,9 @@ public class MusesBlueAuto extends OpMode {
     public void init() {
 
         driveInit();
+        glyphArmInit();
 
-        bucketServoInit();
-        jewelServoInit();
+        jouleThiefInit();
 
         colorInit();
     }
@@ -125,26 +121,23 @@ public class MusesBlueAuto extends OpMode {
     @Override
     public void loop() {
 
-        telemetrys();
-
         if (tracker == 0) {
-            jewelServo.setPosition(1);
+            jouleThiefServo.setPosition(1);
             tracker = 1;
-        } else if (tracker == 1) {
-            if (color.blue() >= 50) { // Blue is detected
-                move(-.3);
-            } else if (color.red() >= 50) { // Red is detected
+        } else if (tracker == 1 && runtime.time() >= 5) {
+            if (color.red() >= 50) { // Red is detected
                 move(.3);
+            } else if (color.blue() >= 50) { // Blue is detected
+                move(-.3);
             } else {
                 move(0);
             }
         }
 
         if (runtime.time() >= 10) {
-            jewelServo.setPosition(0);
+            jouleThiefServo.setPosition(0);
             tracker = 2;
         }
-
     }
 
     @Override
