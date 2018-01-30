@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -9,7 +10,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 /**
  * Created by mars on 1/3/18.
  */
-
 @Autonomous(name = "Glyph Auto", group = "Testing")
 public class glyphAuto extends OpMode {
 
@@ -32,30 +32,13 @@ public class glyphAuto extends OpMode {
 
     private Servo jouleThiefServo = null;
 
-    private double motorThreshold = 0.065;
-
-    private int tracker = 0;
+    private int tracker = 1;
 
     public void telemetrys() {
 
+        telemetry.addData("Left Motor 1 Position: ", leftMotor1.getCurrentPosition());
         telemetry.addData("Runtime: ", runtime.time());
-
-        telemetry.addData("Left Motor Power: ", leftMotor1.getPower());
-        telemetry.addData("Left Motor Power: ", leftMotor2.getPower());
-        telemetry.addData("Right Motor Power: ", rightMotor1.getPower());
-        telemetry.addData("Right Motor Power: ", rightMotor2.getPower());
-
-        telemetry.addData("Lifter Motor Power: ", lifterMotor.getPower());
-        telemetry.addData("Block Servo Position: ", blockServo.getPosition());
-
-        telemetry.addData("Relic Arm Motor: ", relicMotor.getPower());
-        telemetry.addData("Relic Arm Servo 1: ", relicServo1.getPosition());
-        telemetry.addData("Relic Arm Servo 2: ", relicServo2.getPosition());
-
         telemetry.addData("Glyph Arm Motor Position: ", glyphArmMotor.getCurrentPosition());
-
-        //telemetry.addData("Spinner Servo Position: ", spinnerServo.getPosition());
-        telemetry.addData("Joule Thief Servo Position: ", jouleThiefServo.getPosition());
         telemetry.update();
     }
 
@@ -100,20 +83,20 @@ public class glyphAuto extends OpMode {
         relicServo1 = hardwareMap.servo.get("relic servo 1");
         relicServo2 = hardwareMap.servo.get("relic servo 2");
         relicServo1.setPosition(0);
-        relicServo2.setPosition(0);
+        //relicServo2.setPosition(0);
 
     }
 
     public void jouleThiefInit() {
 
         jouleThiefServo = hardwareMap.servo.get("joule thief");
-        jouleThiefServo.setPosition(1);
+        jouleThiefServo.setPosition(0);
     }
 
     public void glyphArmInit() {
 
         glyphArmMotor = hardwareMap.dcMotor.get("glyph arm");
-        glyphArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //glyphArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         glyphArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
@@ -130,31 +113,43 @@ public class glyphAuto extends OpMode {
         glyphArmInit();
     }
 
+    public void motorMethod(double Power){
+        leftMotor1.setPower(Power);
+        leftMotor2.setPower(Power);
+        rightMotor1.setPower(Power);
+        rightMotor2.setPower(Power);
+    }
+
+    public void armLogic() {
+
+        if (leftMotor1.getCurrentPosition() <= 3000) {
+            motorMethod(.5);
+        } else if (leftMotor1.getCurrentPosition() > 3000) {
+            motorMethod(0);
+            if (glyphArmMotor.getCurrentPosition() < 30 && tracker == 1){
+                glyphArmMotor.setPower(.12);
+
+            } else if (glyphArmMotor.getCurrentPosition() >= 10 && tracker == 1){
+                tracker = 2;
+                glyphArmMotor.setPower(0);
+                runtime.reset();
+            } else if (glyphArmMotor.getCurrentPosition() >= -42 && tracker == 2 && runtime.time() > 5){
+                glyphArmMotor.setPower(-.55);
+
+            } else if (tracker == 2){
+                glyphArmMotor.setPower(0);
+
+            }
+        }
+        telemetrys();
+    }
+    @Override public void start(){
+
+        runtime.reset();
+    }
     @Override
     public void loop() {
 
-        if (leftMotor1.getCurrentPosition() < 432){
-            leftMotor1.setPower(1);
-            leftMotor2.setPower(1);
-            rightMotor1.setPower(1);
-            rightMotor2.setPower(1);
-
-        } else if (leftMotor1.getCurrentPosition() >= 432){
-            tracker = 1;
-
-        } else if (glyphArmMotor.getCurrentPosition() < 144 && tracker == 1){
-            glyphArmMotor.setPower(1);
-
-        } else if (glyphArmMotor.getCurrentPosition() >= 144 && tracker == 1){
-            glyphArmMotor.setPower(0);
-            tracker = 2;
-
-        } else if (glyphArmMotor.getCurrentPosition() >= 10 && tracker == 2){
-            glyphArmMotor.setPower(-1);
-
-        } else if (tracker == 2){
-            glyphArmMotor.setPower(0);
-
-        }
+        armLogic();
     }
 }
