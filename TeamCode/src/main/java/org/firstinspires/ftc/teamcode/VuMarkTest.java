@@ -2,9 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -20,113 +20,140 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
+/**        telemetry.update();
+
+*
+* I don't know what is up with this program, we need to do more testing with it...
+*
+*/
+
 @Disabled
 @Autonomous(name="Concept: VuMark Id", group ="Concept")
-public class VuMarkTest extends LinearOpMode {
+public class VuMarkTest extends OpMode {
 
-    public static final String TAG = "Vuforia VuMark Sample";
+    private ElapsedTime runtime = new ElapsedTime();
 
-    private DcMotor leftMotor = null;
-    private DcMotor rightMotor = null;
+    private int tracker = 0;
+    private int position = 0;
 
-    OpenGLMatrix lastLocation = null;
+    private DcMotor leftMotor1 = null;
+    private DcMotor leftMotor2 = null;
+    private DcMotor rightMotor1 = null;
+    private DcMotor rightMotor2 = null;
 
-    /**
-     * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
-     * localization engine.
-     */
+    private DcMotor glyphArmMotor = null;
+
     VuforiaLocalizer vuforia;
 
-    @Override public void runOpMode() {
+            /**
+            * We don't need the camera monitor on the robot phone because we can't see it when using it so its just wasting battery
+            *
+            * To add the monitor back in, remove the parameters line below this and replace with these two lines
+            *int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+            *VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+            */
 
+    VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
-        /*
-         * To start up Vuforia, tell it the view that we wish to use for camera monitor (on the RC phone);
-         * If no camera monitor is desired, use the parameterless constructor instead (commented out below).
-         */
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+    VuforiaTrackables relicTrackables;
+    VuforiaTrackable relicTemplate;
 
-        // OR...  Do Not Activate the Camera Monitor View, to save power
-        // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+    public void glyphArmInit() {
+
+        glyphArmMotor = hardwareMap.dcMotor.get("glyph arm");
+        glyphArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+
+    @Override
+    public void init() {
+
+        glyphArmInit();
+
+        leftMotor1 = hardwareMap.dcMotor.get("left motor 1");
+        leftMotor2 = hardwareMap.dcMotor.get("left motor 2");
+        rightMotor1 = hardwareMap.dcMotor.get("right motor 1");
+        rightMotor2 = hardwareMap.dcMotor.get("right motor 2");
+
+        rightMotor1.setDirection(DcMotor.Direction.REVERSE);
+        rightMotor2.setDirection(DcMotor.Direction.REVERSE);
+
+        leftMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
         parameters.vuforiaLicenseKey = "AcLd9LX/////AAAAGXMDCxRRokZludaA8XxJ6yM/1vcc97SRoLcHM/waQfat+A8aWxq/0QKu6wmmlbnzn7xNS86D69lG8zgmO6+gUxAEgyWT13hLxs+8MqsEUI/SinXX3kCGcJyf2VY1C17NcAGSHFWdZq4tkX1uDj17ch7DYEWsPQFhIfTlAWaz0pZMXM106xUS4Hgi2FVK6SJqD+yC9I3tH0yiT7FHRW1lyXCiHxCqNzh7eyvIaEcJpZyxPbFkOt99P4I3cHz0QecxkUQvCq7L+7KHnVDz9VI/lTXKxbckmGFHSJbC6HnrW4OFK5b8q+z9QlT+vQ5aBaKxLj/mTt1azTPdntGWaYwoRT36yxKrjIHwk2ORx5+avjRP";
 
-        /*
-         * We also indicate which camera on the RC that we wish to use.
-        * Here we chose the back (HiRes) camera (for greater range), but
-         * for a competition robot, the front camera might be more convenient.
-         */
-        //parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
         this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
 
-        /**
-         * Load the data set containing the VuMarks for Relic Recovery. There's only one trackable
-         * in this data set: all three of the VuMarks in the game were created from this one template,
-         * but differ in their instance id information.
-         * @see VuMarkInstanceId
-         */
-        VuforiaTrackables relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
-        VuforiaTrackable relicTemplate = relicTrackables.get(0);
+        relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+        relicTemplate = relicTrackables.get(0);
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
-
-        telemetry.addData(">", "Press Play to start");
-        telemetry.update();
-        waitForStart();
 
         relicTrackables.activate();
 
-        while (opModeIsActive()) {
-
-
-            /**
-             * See if any of the instances of {@link relicTemplate} are currently visible.
-             * {@link RelicRecoveryVuMark} is an enum which can have the following values:
-             * UNKNOWN, LEFT, CENTER, and RIGHT. When a VuMark is visible, something other than
-             * UNKNOWN will be returned by {@link RelicRecoveryVuMark#from(VuforiaTrackable)}.
-             */
-            RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
-            if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
-
-                /* Found an instance of the template. In the actual game, you will probably
-                 * loop until this condition occurs, then move on to act accordingly depending
-                 * on which VuMark was visible. */
-                telemetry.addData("VuMark", "%s visible", vuMark);
-
-                /* For fun, we also exhibit the navigational pose. In the Relic Recovery game,
-                 * it is perhaps unlikely that you will actually need to act on this pose information, but
-                 * we illustrate it nevertheless, for completeness. */
-                OpenGLMatrix pose = ((VuforiaTrackableDefaultListener)relicTemplate.getListener()).getPose();
-                telemetry.addData("Pose", format(pose));
-
-                /* We further illustrate how to decompose the pose into useful rotational and
-                 * translational components */
-                if (pose != null) {
-                    VectorF trans = pose.getTranslation();
-                    Orientation rot = Orientation.getOrientation(pose, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-
-                    // Extract the X, Y, and Z components of the offset of the target relative to the robot
-                    double tX = trans.get(0);
-                    double tY = trans.get(1);
-                    double tZ = trans.get(2);
-
-                    // Extract the rotational components of the target relative to the robot
-                    double rX = rot.firstAngle;
-                    double rY = rot.secondAngle;
-                    double rZ = rot.thirdAngle;
-                }
-
-            }
-            else {
-                telemetry.addData("VuMark", "not visible");
-            }
-
-            telemetry.update();
-        }
     }
 
-    String format(OpenGLMatrix transformationMatrix) {
-        return (transformationMatrix != null) ? transformationMatrix.formatAsTransform() : "null";
+    @Override
+    public void start() {
+
+        runtime.reset();
+    }
+
+    public void motorMethod(double Power){
+        leftMotor1.setPower(Power);
+        leftMotor2.setPower(Power);
+        rightMotor1.setPower(Power);
+        rightMotor2.setPower(Power);
+    }
+
+    @Override
+    public void loop() {
+
+        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
+        if (vuMark != RelicRecoveryVuMark.UNKNOWN && tracker == 0) {
+            telemetry.addData("VuMark", " visible");
+
+            if (vuMark == RelicRecoveryVuMark.LEFT) {
+                tracker++;
+                position = 3000;
+            } else if (vuMark == RelicRecoveryVuMark.CENTER) {
+                tracker++;
+                position = 3500;
+            } else if (vuMark == RelicRecoveryVuMark.RIGHT) {
+                tracker++;
+                position = 4000;
+            }
+
+            telemetry.addData("VuMark", "%s visible", vuMark);
+        } else if (tracker != 0) {
+            if (leftMotor1.getCurrentPosition() < position) {
+                motorMethod(.5);
+            } else {
+                motorMethod(0);
+                if (glyphArmMotor.getCurrentPosition() < 30 && tracker == 1){
+                    glyphArmMotor.setPower(.12);
+
+                } else if (glyphArmMotor.getCurrentPosition() >= 30 && tracker == 1){
+                    tracker = 2;
+                    glyphArmMotor.setPower(0);
+                    runtime.reset();
+                } else if (glyphArmMotor.getCurrentPosition() >= 1 && tracker == 2 && runtime.time() >= 5){
+                    glyphArmMotor.setPower(-.375);
+
+                } else if (tracker == 2){
+                    glyphArmMotor.setPower(0);
+
+                }
+            }
+        } else {
+            telemetry.addData("VuMark", "not visible");
+        }
+
+        telemetry.addData("Left Motor 1 Pos: ", leftMotor1.getCurrentPosition());
+
+        telemetry.update();
     }
 }
