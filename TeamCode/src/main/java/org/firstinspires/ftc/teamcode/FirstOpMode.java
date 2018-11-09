@@ -38,6 +38,7 @@ public class FirstOpMode extends OpMode
 
     @Override
     public void init_loop() {
+
     }
 
     /*
@@ -78,6 +79,7 @@ public class FirstOpMode extends OpMode
 
     @Override
     public void stop() {
+
     }
 
 }
