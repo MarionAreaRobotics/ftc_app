@@ -8,18 +8,25 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class TestAuto  extends OpMode{
 
    private int tracker = 0;
+
    private DcMotor leftMotor1 = null;
    private DcMotor rightMotor1 = null;
    private DcMotor leftMotor2 = null;
    private DcMotor rightMotor2 = null;
 
     public void telemetrys() {
+        telemetry.addData("leftMotor1 Power", leftMotor1.getPower());
+        telemetry.addData("leftMotor2 Power", leftMotor2.getPower());
+        telemetry.addData("rightMotor1 Power", rightMotor1.getPower());
+        telemetry.addData("rightMotor2 Power", rightMotor2.getPower());
+
         telemetry.addData("leftMotor1 position", leftMotor1.getCurrentPosition());
         telemetry.addData("rightMotor1 position", rightMotor1.getCurrentPosition());
         telemetry.addData("leftMotor2 position", leftMotor2.getCurrentPosition());
         telemetry.addData("rightMotor2 position", rightMotor2.getCurrentPosition());
 
         telemetry.addData("Tracker Value:  ", tracker);
+
 
         telemetry.update();
     }
@@ -46,17 +53,29 @@ public class TestAuto  extends OpMode{
     }
 
     public void autoLoop() {
-        if (leftMotor1.getCurrentPosition() <= -3800 && tracker == 0) {
-            move(-1,-1,-1,-1);
+
+        telemetry.addData("Right Motor Position", rightMotor1.getCurrentPosition());
+        telemetry.addData("Tracker", tracker);
+
+        if (rightMotor1.getCurrentPosition() >= -4200 && tracker == 0) {
+            move(-1, -1, -1, -1);
+        }else if (tracker == 0 && rightMotor1.getCurrentPosition() <= -4200){
             tracker = 1;
-        } else if (leftMotor1.getCurrentPosition() >= -4400  && tracker == 1) {
-            move(-1,-1,1,1);
+            telemetry.addLine("Here 1");
+        } else if (rightMotor1.getCurrentPosition() <= -3200 && tracker == 1) {
+            move(-1, -1, 1, 1);
+        }else if (tracker == 1 && rightMotor1.getCurrentPosition() >= -3200){
             tracker = 2;
-        } else if (leftMotor1.getCurrentPosition() <= 2000  &&  tracker == 2) {
-            move(1,1,1,1);
+            telemetry.addLine("Here 2");
+        } else if (rightMotor1.getCurrentPosition() <= 3500 && tracker == 2) {
+            move(1, 1, 1, 1);
+        } else if (tracker == 2 && rightMotor1.getCurrentPosition() >= 5000){
             tracker = 3;
-        } else if (leftMotor1.getCurrentPosition() >= 2000 && tracker == 3)  {
-            move(0,0,0,0);
+            telemetry.addLine("Here 3");
+        } else if (tracker == 3) {
+            move(0, 0, 0, 0);
+            telemetry.addLine("Here 4");
+            tracker = 4;
         }
     }
 
@@ -70,5 +89,4 @@ public class TestAuto  extends OpMode{
         autoLoop();
         telemetrys();
     }
-
 }

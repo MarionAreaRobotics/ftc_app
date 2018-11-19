@@ -34,11 +34,13 @@ public class TitanRoverAuto extends OpMode {
         telemetry.addData("Right Motor 1 Power: ", rightMotor1.getPower());
         telemetry.addData("Right Motor 2 Power: ", rightMotor2.getPower());
         telemetry.addData("Lifter Motor Power: ", lifterMotor.getPower());
+        telemetry.addData("Lifter Motor Posistion", lifterMotor.getCurrentPosition());
 
         telemetry.addData("Gamepad 2 Left-Y Position: ", gamepad2.left_stick_y);
 
         telemetry.update();
     }
+
     public void driveInit() {
 
         leftMotor1 = hardwareMap.dcMotor.get("left motor 1");
@@ -51,13 +53,16 @@ public class TitanRoverAuto extends OpMode {
         rightMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
-    public void armInit(){
+
+    public void armInit() {
         armMotor = hardwareMap.dcMotor.get("arm motor");
         jointMotor = hardwareMap.dcMotor.get("joint motor");
         lifterMotor = hardwareMap.dcMotor.get("lifter motor");
         bucketServo = hardwareMap.servo.get("bucket servo");
         slidingMotor = hardwareMap.dcMotor.get("sliding motor");
         lockServo = hardwareMap.servo.get("lock servo");
+
+        lockServo.setPosition(1);
 
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         jointMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -66,14 +71,13 @@ public class TitanRoverAuto extends OpMode {
     }
 
 
-
     @Override
     public void init() {
         driveInit();
         armInit();
     }
 
-    public void move(float power1, float power2, float power3, float power4){
+    public void move(float power1, float power2, float power3, float power4) {
 
         leftMotor1.setPower(power1);
         leftMotor2.setPower(power2);
@@ -83,31 +87,58 @@ public class TitanRoverAuto extends OpMode {
 
     @Override
     public void loop() {
-    telemetrys();
-        if (lockServo.getPosition() == 1 && tracker == 0){
-            if (lockServo.getPosition() != 0){
+        telemetrys();
+
+        if (lockServo.getPosition() == 1 && tracker == 0) {
+            if (lockServo.getPosition() != 0) {
                 lockServo.setPosition(0);
             }
-            lifterMotor.setPower(-0.5);
+        } else if (tracker == 0 && lockServo.getPosition() == 0){
             tracker = 1;
 
-        } else if (lifterMotor.getCurrentPosition() >= -350 && tracker == 1){
-            if (lockServo.getPosition() != 1){
-                lockServo.setPosition(1);
+        } else if (lifterMotor.getCurrentPosition() <= 750 && tracker == 1) {
+            if (lockServo.getPosition() != 0) {
+                lockServo.setPosition(0);
             }
-            lifterMotor.setPower(0);
+            lifterMotor.setPower(.5);
+        } else if (lifterMotor.getCurrentPosition() >= 750 && tracker == 1){
             tracker = 2;
+        } else if (tracker == 2){
+            lifterMotor.setPower(0);
+        }
 
-        } else if (leftMotor1.getCurrentPosition() >= 4800 && tracker == 2){
+        /*
+        if (lockServo.getPosition() == 1 && tracker == 0) {
+            if (lockServo.getPosition() != 0) {
+                lockServo.setPosition(0);
+            }
+        } else if (tracker == 0 && lockServo.getPosition() == 0) {
+            tracker = 1;
+
+        } else if (lifterMotor.getCurrentPosition() <= 500 && tracker == 1) {
+            if (lockServo.getPosition() != 0) {
+                lockServo.setPosition(0);
+            }
+            lifterMotor.setPower(.5);
+        } else if (lifterMotor.getCurrentPosition() >= 500 && tracker == 1) {
+            tracker = 2;
+        } else if (tracker == 2) {
+            lifterMotor.setPower(0);
+
+        } else if (leftMotor1.getCurrentPosition() >= -4800 && tracker == 2) {
             move(-1, -1, 1, 1);
+        } else if (tracker == 2 && leftMotor1.getCurrentPosition() <= 4800) {
             tracker = 3;
 
-        } else if (leftMotor1.getCurrentPosition() >= 7200 && tracker == 3){
+        } else if (leftMotor1.getCurrentPosition() <= 2000 && tracker == 3) {
             move(1, 1, 1, 1);
+        } else if (tracker == 3 && leftMotor1.getCurrentPosition() >= 2000) {
             tracker = 4;
 
-        } else {
-            move(0,0,0,0);
+        } else if (tracker == 4 && leftMotor1.getCurrentPosition() >= 2000) {
+            move(0, 0, 0, 0);
         }
+
+*/
     }
 }

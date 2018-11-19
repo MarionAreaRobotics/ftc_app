@@ -34,8 +34,9 @@ public class OlympianRoverAuto extends OpMode {
         telemetry.addData("Right Motor 1 Power: ", rightMotor1.getPower());
         telemetry.addData("Right Motor 2 Power: ", rightMotor2.getPower());
 
-        telemetry.addData("Arm Motor Power: ", armMotor.getPower());
-        telemetry.addData("Arm Motor Position: ", armMotor.getCurrentPosition());
+        telemetry.addData("Right Motor 1 Position", rightMotor1.getCurrentPosition());
+
+        telemetry.addData("Lifter Motor Position", armMotor.getCurrentPosition());
 
         telemetry.update();
     }
@@ -66,10 +67,6 @@ public class OlympianRoverAuto extends OpMode {
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lifterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        grabServo1.setPosition(.5);
-        grabServo2.setPosition(.5);
-        armServo.setPosition(0);
-
         grabServo2.setDirection(Servo.Direction.REVERSE);
     }
 
@@ -90,21 +87,54 @@ public class OlympianRoverAuto extends OpMode {
     @Override
     public void loop() {
         telemetrys();
-         if (lifterMotor.getCurrentPosition() >= -1600 && tracker == 0){
+/*
+        if (armMotor.getCurrentPosition() <= 1100){
+            armMotor.setPower(1);
+        } else if (armMotor.getCurrentPosition() >= 100){
+            armMotor.setPower(0);
 
-            lifterMotor.setPower(0);
+            if(grabServo1.getPosition() != 1){
+                grabServo1.setPosition(1);
+            }
+        }
+*/
+        if (lifterMotor.getCurrentPosition() >= -900 && tracker == 0) {
+            lifterMotor.setPower(.5);
+        } else if (tracker == 0 && lifterMotor.getCurrentPosition() <= -900) {
             tracker = 1;
-
-        } else if (leftMotor1.getCurrentPosition() >= 4800 && tracker == 1){
-            move(-1, -1, 1, 1);
+        } else if (tracker == 1 && lifterMotor.getCurrentPosition() >= -900){
+            lifterMotor.setPower(0);
             tracker = 2;
-
-        } else if (leftMotor1.getCurrentPosition() >= 7200 && tracker == 2){
-            move(1, 1, 1, 1);
-            tracker = 3;
-
-        } else {
+        } else if (tracker == 2 && rightMotor1.getCurrentPosition() >= -300){
+            move(1,1,-1,-1);
+        } else if(tracker == 2 && rightMotor1.getCurrentPosition() <= -300){
             move(0,0,0,0);
         }
+
+        /*
+        if (lifterMotor.getCurrentPosition() >= -1600 && tracker == 0) {
+            lifterMotor.setPower(.5);
+        } else if (tracker == 0 && lifterMotor.getCurrentPosition() <= -1600) {
+            tracker = 1;
+        } else if (tracker == 1 && lifterMotor.getCurrentPosition() >= 1600){
+            lifterMotor.setPower(0);
+        } else if (rightMotor1.getCurrentPosition() >= -4800 && tracker == 1) {
+            move(1, 1, -1, -1);
+        } else if (tracker == 1 && rightMotor1.getCurrentPosition() <= -4800){
+            tracker = 2;
+        } else if (rightMotor1.getCurrentPosition() <= -3400 && tracker == 2) {
+            move(1, 1, 1, 1);
+        } else if (tracker == 2 && rightMotor1.getCurrentPosition() >= -3400){
+            tracker = 3;
+        } else if (tracker == 3){
+            move(0,0,0,0);
+            tracker = 4;
+        } else if (tracker == 4 && armMotor.getCurrentPosition() <= 1100){
+            armMotor.setPower(.5);
+        } else if (tracker == 4 && armMotor.getCurrentPosition() >= 1100){
+            armMotor.setPower(0);
+        }
+        */
     }
+
 }

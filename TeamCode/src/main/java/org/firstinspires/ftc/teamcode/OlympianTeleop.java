@@ -18,6 +18,7 @@ public class OlympianTeleop extends OpMode {
 
     private Servo grabServo1 = null;
     private Servo grabServo2 = null;
+    private Servo driveServo = null;
     private Servo armServo = null;
     private DcMotor armMotor = null;
     private DcMotor lifterMotor = null;
@@ -63,6 +64,7 @@ public class OlympianTeleop extends OpMode {
         armServo = hardwareMap.servo.get("arm servo");
         armMotor = hardwareMap.dcMotor.get("arm motor");
         lifterMotor = hardwareMap.dcMotor.get("lifter motor");
+        driveServo = hardwareMap.servo.get("drive servo");
 
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lifterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -70,6 +72,7 @@ public class OlympianTeleop extends OpMode {
         grabServo1.setPosition(.5);
         grabServo2.setPosition(.5);
         armServo.setPosition(0);
+        driveServo.setPosition(0);
 
         grabServo2.setDirection(Servo.Direction.REVERSE);
     }
@@ -149,8 +152,16 @@ public class OlympianTeleop extends OpMode {
         ServoMethod(grabServo2, .4, gamepad2.x);
         ServoMethod(grabServo2, 1, gamepad2.y);
 
-        ServoMethod(armServo,.2, gamepad2.right_bumper);
-        ServoMethod(armServo, 0, gamepad2.left_bumper);
+
+
+
+        ServoMethod(armServo,.3, gamepad2.dpad_right);
+        ServoMethod(armServo, .7, gamepad2.dpad_left);
+        ServoMethod(armServo, 0, gamepad2.dpad_up);
+        ServoMethod(armServo, 1, gamepad2.dpad_down);
+
+        ServoMethod(driveServo, 1, gamepad1.a);
+        ServoMethod(driveServo, 0, gamepad1.b);
 
 
        if (gamepad2.right_trigger > 0){
