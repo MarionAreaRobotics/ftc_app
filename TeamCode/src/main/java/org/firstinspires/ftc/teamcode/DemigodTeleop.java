@@ -16,10 +16,13 @@ public class DemigodTeleop extends OpMode{
     private DcMotor rightMotor1 = null;
     private DcMotor rightMotor2 = null;
 
+    private DcMotor armMotor1 = null;
+    private DcMotor armMotor2 = null;
+
     private DcMotor lifterMotor = null;
 
-    private Servo boxServo1 = null;
-    private Servo boxServo2 = null;
+    private Servo boxServo = null;
+
 
 
     private double motorThreshold = 0.065;
@@ -35,8 +38,8 @@ public class DemigodTeleop extends OpMode{
 
         telemetry.addData("Lifter Motor Power:  ", lifterMotor.getPower());
 
-        telemetry.addData("Box Servo 1: ", boxServo1.getPosition());
-        telemetry.addData("Box Servo 2: ", boxServo2.getPosition());
+        telemetry.addData("Box Servo: ", boxServo.getPosition());
+
 
 
         telemetry.update();
@@ -58,10 +61,13 @@ public class DemigodTeleop extends OpMode{
 
     public void lifterInit() {
         lifterMotor = hardwareMap.dcMotor.get("lifter motor");
-        boxServo1 = hardwareMap.servo.get("box servo 1");
-        boxServo2 = hardwareMap.servo.get("box servo 2");
+        boxServo = hardwareMap.servo.get("box servo");
 
-        boxServo2.setDirection(Servo.Direction.REVERSE);
+        armMotor1 = hardwareMap.dcMotor.get("arm motor 1");
+        armMotor2 = hardwareMap.dcMotor.get("arm motor 2");
+
+
+
         lifterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
@@ -114,13 +120,13 @@ public class DemigodTeleop extends OpMode{
 
     public void ServoMethod(Servo servo, double Position, boolean button) {
 
-        if (button) {
-            if (servo.getPosition() != Position){
-                servo.setPosition(Position);
+        if (gamepad2.a) {
+            if (boxServo.getPosition() != 0){
+                boxServo.setPosition(1);
             }
         } else {
-            if (servo.getPosition() != 1){
-                servo.setPosition(1);
+            if (boxServo.getPosition() != 1){
+                boxServo.setPosition(0);
             }
         }
     }
@@ -135,8 +141,11 @@ public class DemigodTeleop extends OpMode{
             lifterMotor.setPower(0);
         }
 
-        ServoMethod(boxServo1, 0, gamepad2.a);
-        ServoMethod(boxServo2, 0, gamepad2.b);
+        armMotor1.setPower(gamepad2.left_stick_y);
+        armMotor2.setPower(gamepad2.right_stick_y);
+        ServoMethod(boxServo, .5, gamepad2.a);
+        ServoMethod(boxServo, .75, gamepad2.b);
+
     }
 
     @Override
